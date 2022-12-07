@@ -1,0 +1,18 @@
+function AddEvent(){
+  const [coverimg, setcoverimg] = useState('');
+  const [newimg, setnewimg] = useState('');
+  return(
+    <div className='MForm'>
+      <input id="desiredimg" type="file" class="file-input" accept="image/*" hidden/>
+      <button class="choose-img" onclick={event => {
+        console.log("upload image");
+        coverimg.click();
+        coverimg.onchange = ()=>{
+          var reader = new FileReader()
+          newimg.src = URL.createObjectURL(coverimg.files[0])
+        } 
+      }}>Choose Image</button>
+
+    </div>
+  );
+}
