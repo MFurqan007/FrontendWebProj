@@ -5,6 +5,7 @@ import React, {useState, useEffect} from 'react';
 
 import {
   BrowserRouter,
+  useNavigate,
   Switch,
   Route,
   Link,
@@ -13,6 +14,7 @@ import {
 
 let profiledata = null;
 function Login(){
+  let navigate = useNavigate(); 
   const [userName, setuserName] = useState('');
   const [password, setpassword] = useState('');
   return(
@@ -42,8 +44,9 @@ function Login(){
                     const data = await fetch(`http://localhost:4000/user/login/${userName}/${password}`)
                     const dj = await data.json();
                     profiledata = dj;
-                    console.log(profiledata); 
-                  }
+                    console.log(profiledata);
+                    navigate("/Home");
+                    }
                   }
                   >Submit</button>
                   <div className= "centerbtn">
@@ -316,7 +319,23 @@ function AddEvent(){
   );
 }
 
+function Community(){
+  return(
+    <div className='CommunityPage'>
+      <h1>Community</h1>
+    </div>
+  );
+}
+
 function MainPage(){
+  const [HomeFlag, setHomeFlag] = useState(null);
+  const [CommunityFlag, setCommunityFlag] = useState(null); 
+  const [AccountFlag, setAccountFlag] = useState(null);
+  const [MessengerFlag, setMessengerFlag] = useState(null); 
+  const [AddPostFlag, setAddPost] = useState(null);
+  // const [LogoutFlag, setLogoutFlag] = useState(null); 
+
+  let navigate = useNavigate(); 
   return(
     <div className='MainPage'>
       <nav className='Navbar'>
@@ -328,20 +347,46 @@ function MainPage(){
       <div className='MainComp'>
         <div className='mainNav'>
           <div className='bar'>
-              <img src="./Home.svg" alt="home" className='unselect'/>
-              <img src="./Community.svg" alt="community" className='unselect'/>
-              <img src="./Account.svg" alt="account" className='unselect'/>
-              <img src="./powerOff.svg" alt="power off" className='unselect'/>
+              <img src="./Home.svg" alt="home" className={HomeFlag? "select" : "unselect"} onClick={event =>{
+                setHomeFlag(true); 
+                setAccountFlag(false);
+                setCommunityFlag(false);
+              }}/>
+              <img src="./Community.svg" alt="community" className={CommunityFlag? "select" : "unselect"} onClick={event =>{
+                setHomeFlag(false); 
+                setAccountFlag(false);
+                setCommunityFlag(true);
+              }}/>
+              <img src="./Account.svg" alt="account" className={AccountFlag? "select" : "unselect"} onClick={event =>{
+                setHomeFlag(false); 
+                setAccountFlag(true);
+                setCommunityFlag(false);
+              }}/>
+              <img src="./powerOff.svg" alt="power off" className='unselect' onClick={event =>{
+                navigate("/");
+              }}/>
           </div>
         </div>
+        {HomeFlag && <AllPosts/>}
+        {CommunityFlag && <Community/>}
+        {AccountFlag && <ProfileInfo/>}
         {/* <AllPosts/> */}
-        <ProfileInfo/>
+        {/* <ProfileInfo/> */}
+        {/* <Community/> */}
         <div className='mainChats'>
             <div className='selection'>
-              <img src="./AddEvent.svg" alt="AddEvent" className='unselect'/>
-              <img src="./Messenger.svg" alt="Chats" className='unselect'/>
+              <img src="./AddEvent.svg" alt="AddEvent" className={AddPostFlag? "select" : "unselect"} onClick={event =>{
+                setMessengerFlag(false); 
+                setAddPost(true);
+              }}/>
+              <img src="./Messenger.svg" alt="Chats" className={MessengerFlag? "select" : "unselect"} onClick={event =>{
+                setMessengerFlag(true); 
+                setAddPost(false);
+              }}/>
             </div>
-            <Chats/>
+            {MessengerFlag && <Chats/>}
+            {AddPostFlag && <AddEvent/>}
+            {/* <Chats/> */}
             {/* <AddEvent/> */}
 
         </div>

@@ -375,6 +375,10 @@ h1{
   overflow-y: auto;
 }
 
+.CommunityPage{
+  width: 55vw; 
+  height: 90vh;  
+}
 .PostMain2{
   margin-top: 10px;
   width: 35vw;
