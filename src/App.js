@@ -327,14 +327,73 @@ function Community(){
   );
 }
 
+function AddFriendTab({data}){
+  const [friend, setfriend] = useState(null);
+  const [caption, setcaption] = useState(null); 
+  console.log(data)
+  return(
+    <div className='AddFriendTab'>
+      <div className='FriendImage'>
+
+      </div>
+      <div className='FriendName'>
+        <p className='FriendNText'>{data.userName}</p>
+      </div>
+      <button className='Follow' onClick={async (event)=>{
+          event.preventDefault()
+
+          const d = await fetch(`http://localhost:4000/user/add_followers/${profiledata.userName}/${data.userName}`,{  // Enter your IP address here
+            headers: {'Content-Type': 'application/json'},
+              method: 'PUT', 
+              mode: 'cors',
+            });
+        }
+      }>+</button>
+    </div>
+  );
+}
+function AddFriend({data}){
+  // console.log(data)
+  return(
+    <div className='FriendPage'>
+        {/* <h1>Friends</h1> */}
+        <div className='FriendsTitle'>
+
+        </div>
+        <div className='AllPossibleFriends'>
+          {data.map((d)=>{
+            return (<AddFriendTab data = {d}/>)
+          })}
+          
+          {/* <AddFriendTab/>
+          <AddFriendTab/>
+          <AddFriendTab/>
+          <AddFriendTab/>
+          <AddFriendTab/>
+          <AddFriendTab/>
+          <AddFriendTab/>
+          <AddFriendTab/>
+          <AddFriendTab/>
+
+          <AddFriendTab/>
+
+          <AddFriendTab/>
+          <AddFriendTab/>
+          <AddFriendTab/> */}
+        </div>
+    </div>
+  );
+}
 function MainPage(){
   const [HomeFlag, setHomeFlag] = useState(null);
   const [CommunityFlag, setCommunityFlag] = useState(null); 
   const [AccountFlag, setAccountFlag] = useState(null);
   const [MessengerFlag, setMessengerFlag] = useState(null); 
   const [AddPostFlag, setAddPost] = useState(null);
-  // const [LogoutFlag, setLogoutFlag] = useState(null); 
+  const [AddFriendFlag, setAddFriend] = useState(null); 
 
+
+  const [AddFriendsData, setAddFriendsData] = useState(null); 
   let navigate = useNavigate(); 
   return(
     <div className='MainPage'>
@@ -351,17 +410,33 @@ function MainPage(){
                 setHomeFlag(true); 
                 setAccountFlag(false);
                 setCommunityFlag(false);
+                setAddFriend(false);
               }}/>
               <img src="./Community.svg" alt="community" className={CommunityFlag? "select" : "unselect"} onClick={event =>{
                 setHomeFlag(false); 
                 setAccountFlag(false);
                 setCommunityFlag(true);
+                setAddFriend(false);
               }}/>
               <img src="./Account.svg" alt="account" className={AccountFlag? "select" : "unselect"} onClick={event =>{
                 setHomeFlag(false); 
                 setAccountFlag(true);
                 setCommunityFlag(false);
+                setAddFriend(false);
               }}/>
+              <img src="./AddIconFriend.svg" alt="add friend" className={AddFriendFlag? "select" : "unselect"} onClick={async (event)=>{
+                    setHomeFlag(false); 
+                    setAccountFlag(false);
+                    setCommunityFlag(false);
+                    setAddFriend(true);
+                    event.preventDefault()
+
+                    const data = await fetch(`http://localhost:4000/user/get`)
+                    const dj = await data.json();
+                    setAddFriendsData(dj)
+                    console.log(dj);
+                  }
+                }/>
               <img src="./powerOff.svg" alt="power off" className='unselect' onClick={event =>{
                 navigate("/");
               }}/>
@@ -370,6 +445,7 @@ function MainPage(){
         {HomeFlag && <AllPosts/>}
         {CommunityFlag && <Community/>}
         {AccountFlag && <ProfileInfo/>}
+        {AddFriendFlag && <AddFriend data= {AddFriendsData}/>}
         {/* <AllPosts/> */}
         {/* <ProfileInfo/> */}
         {/* <Community/> */}

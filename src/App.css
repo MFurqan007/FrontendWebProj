@@ -407,6 +407,61 @@ h1{
   font-size: 22px;
   color: #3782e8;
 }
+
+.FriendPage{
+  width: 55vw; 
+  height: 90vh;
+  background-color: #a2c4f3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.FriendsTitle{
+  width: 15vw;
+  height: 90vh;
+  background-color: #E8E8E8;
+}
+.AllPossibleFriends{
+  width: 40vw;
+  height: 90vh;
+  background-color: white;
+  overflow-y: auto;
+}
+.AddFriendTab{
+  margin-left: 5vw;
+  margin-top: 2vh;
+  width: 30vw; 
+  height: 20vh;
+  background-color: #a2c4f3;
+  border-radius: 25px;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.FriendNText{
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+}
+.FriendImage{
+  width: 15vh;
+  height: 15vh;
+  border-radius: 50%;
+  background-color: #E8E8E8;
+}
+.FriendName{
+  width: 15vw; 
+  height: 5vh;
+  background-color: #E8E8E8;
+}
+.Follow{
+  width: 5vh;
+  height: 5vh;
+  border-radius: 50%;
+  font-weight: 700;
+}
 /* .CaptionText{
   font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-style: normal;
