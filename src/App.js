@@ -13,6 +13,7 @@ import {
 } from "react-router-dom";
 
 let profiledata = null;
+const images = ["mypic.jpg","Travel Journal.jpeg","1670416315865Travel journal.jpeg"];
 function Login(){
   let navigate = useNavigate(); 
   const [userName, setuserName] = useState('');
@@ -160,58 +161,224 @@ function Signup(){
   ); 
 }
 
-function Post(){
+function Post({idata}){
+  const [img,setimg] = useState(null)
+
+  useEffect(()=>{
+    async function getimage(){
+      const imgfile = await fetch('http://localhost:4000/user/userimage/'+idata)
+      const img__ = await imgfile.blob()
+      setimg(img__)
+    }
+    getimage()
+  },[])
+
   return(
     <div className='PostMain'>
-      <h1>Hello World</h1>
+      <div className='PostMainImg'>
+        {img && <img src={URL.createObjectURL(img)  } className='PostPic'/>}
+        {/* <img src={idata}  className='PostPic'/> */}
+      </div>
     </div>
   ); 
 }
 
-function AllPosts(){
+function AllPosts({imgdata}){
+  
   return(
     <div className='mainPosts'>
       <div className='postsDiv'>
-        <Post/>
-        <Post/>
-        <Post/>
+        {images.map((img) => {
+          return(
+            <Post idata = {img}/>
+          )  
+        })
+        }
+        {/* <Post idata = {imgdata}/> */}
+        {/* {imgdata.map((img)=>{
+          return(
+            <Post idata = {img} />
+          )
+        })} */}
+        {/* <Post/>
+        <Post/> */}
       </div>
     </div>
   ); 
 }
-function Chat(){
+// function Chat(){
+//   return(
+//     <div className='chatbox'>  
+//       <div className='profilephoto'>
+
+//       </div>
+//       <div className='profileinfo'>
+
+//       </div>
+//     </div>
+//   );
+// }
+
+// function Chats(){
+//   return(
+//     <div className='mainDiv'>
+//         <p className='Text'>Messages</p>
+//           <div className='AllTexts'>
+//               <Chat/>
+//               <Chat/>
+//               <Chat/>
+//               <Chat/>
+//               <Chat/>
+//               <Chat/>
+//               <Chat/>
+//               <Chat/>
+//               <Chat/>
+//               <Chat/>
+//               <Chat/>
+//               <Chat/>
+//               <Chat/>
+//               <Chat/>
+//               <Chat/>
+//           </div>
+//     </div>
+
+//   ); 
+// }
+
+function Chat({senderuserName,latestMessage}){
+  const [image, setImage] = useState(null);
+
+  useEffect(()=>{
+    async function getImageFile(){
+      const imageFile = await fetch("http://localhost:4000/user/userImage")
+      // const file = await imageFile.json()
+      console.log(imageFile)
+    }
+
+    getImageFile()
+  },[])
+
   return(
     <div className='chatbox'>  
       <div className='profilephoto'>
-
+        {image && image}
       </div>
       <div className='profileinfo'>
-
+        <div><h4>{senderuserName}</h4></div>
+        <div className="lastestChat">{latestMessage}</div>
       </div>
     </div>
   );
 }
 
+function ChatWindow({receiver,sender,goBack}){
+  const [messages, setMessages] = useState([]);
+
+  async function getMessages(){
+    let data = await fetch(`http://localhost:4000/chat/get/${receiver}/${sender}`)
+    console.log(data)
+    let data_ = await data.json()
+
+    setMessages(data_)
+}
+
+  useEffect(()=>{
+    
+    getMessages()
+  },
+  [])
+  const [newMessage, setNewMessage] = useState('');
+  
+
+  return(
+
+    <div>
+      <button onClick={goBack}>Back</button>
+        <div>
+          {messages.map((msg)=>{
+            let classnm = msg.sender==receiver ? "leftbox" : "rightbox"
+            return(
+              <div>
+                <div className={classnm}>
+                  <div className='messagebox'>{msg.message}</div>
+                </div>
+                <div>
+
+                </div>
+              </div>
+            )
+          })}
+        </div> 
+        <input type="text" id="disabledTextInput" className="form-control" placeholder="New Message" onChange={event =>{
+                      setNewMessage(event.target.value)}}/>
+                <button onClick={async ()=>{
+                  await fetch('http://localhost:4000/chat/create', {  // Enter your IP address here
+                      headers: {'Content-Type': 'application/json'},
+                        method: 'POST', 
+                        mode: 'cors', 
+                        body: JSON.stringify({
+                          "sender":sender,
+                          "receiver":receiver,
+                          "message":newMessage,
+                          "date":Date.now()
+                        })
+                
+                })
+                await getMessages()
+                }}> Send</button>     
+    </div>
+  )
+}
+
 function Chats(){
+
+  const [messages, setMessages] = useState([]);
+  const [chatWindow,setChatWindow] = useState(null);
+  const [receiver,setReceiver] = useState(null);
+  const [sender,setSender] = useState(null);
+
+  useEffect(()=>{
+    const getdatafunc = async ()=>{
+      let messages_json = await fetch(`http://localhost:4000/chat/get/${profiledata.userName}`)
+      let messages = await messages_json.json()
+      setMessages(messages);
+    }
+    getdatafunc()
+  },[])  
+
+  // let uniqueSenders = new Set(messages.sender)
+
+  // uniqueSenders = Array.from(uniqueSenders)
+
+  // const formattedMessages = uniqueSenders.map((sender)=>{
+  //   return messages.filter((message)=> message.sender == sender)
+  // })
+
+  // console.log(formattedMessages)
+
+  const prev = ()=>{
+    setChatWindow(false)
+  }
+
   return(
     <div className='mainDiv'>
         <p className='Text'>Messages</p>
           <div className='AllTexts'>
-              <Chat/>
-              <Chat/>
-              <Chat/>
-              <Chat/>
-              <Chat/>
-              <Chat/>
-              <Chat/>
-              <Chat/>
-              <Chat/>
-              <Chat/>
-              <Chat/>
-              <Chat/>
-              <Chat/>
-              <Chat/>
-              <Chat/>
+              {chatWindow ? <ChatWindow receiver={receiver} sender={sender} goBack={prev}/> : 
+              messages.filter((msg)=>msg.receiver == profiledata.userName).map((msg)=>{
+                return(
+                  <button onClick={()=>{
+                    setSender(profiledata.userName)
+                    setReceiver(msg.sender)
+                    setChatWindow(true)
+                  }} className="chatButton">
+                    <Chat 
+                      senderuserName={msg.sender}
+                      latestMessage={msg.message}
+                    />
+                  </button>
+                )
+              })}
           </div>
     </div>
 
@@ -286,7 +453,19 @@ function AddEvent(){
   }
 
   return(
-    <div className='MForm'>
+    <div>
+    <form method="POST" action="http://localhost:4000/profile-upload-single" enctype="multipart/form-data">
+    <div>
+        <label>Upload profile picture</label>
+        <input type="file" id="imagefileup" name="profile-file" required/>
+    </div>
+    <div>
+        <input type="submit" value="Upload" onClick={()=>{
+          images.push(document.getElementById("imagefileup").value)
+        }} />
+    </div>
+    </form>
+    {/* // <div className='MForm'> */}
       
         {/* <div
         <img alt="not fount" width={"250px"} src={URL.createObjectURL(selectedImage)} />
@@ -294,17 +473,19 @@ function AddEvent(){
         <button onClick={()=>setSelectedImage(null)}>Remove</button>
         </div> */}
       
-     {/* <form method='POST' action="http://localhost:4000/profile-upload-single" enctype="multipart/form-data"> */}
+     {/* <form method='POST' action="http://localhost:4000/profile-upload-single" enctype="multipart/form-data">
       <div className='PostPic'>
         {selectedImage && <img src={URL.createObjectURL(selectedImage)  } className='PostPic'/>}
       </div>
       <input type="file" id="uploadImageplace" name="myImage" className='chooseimg' onChange={(event) => {
             // console.log(event.target.files[0]);
+            images.push(event.target.files[0].name)
             setSelectedImage(event.target.files[0]);
           }}
       hidden={true}/>
 
       <button className="chooseimg" onClick={(event) => {
+            event.preventDefault()
             document.getElementById('uploadImageplace').click();
           }}>Choose Image</button>
       <div className='PostCaption'>
@@ -313,8 +494,9 @@ function AddEvent(){
           setcaption(event.target.value);
         }}/>
       </div>
-      <button className="savebtn" onClick={handleclick}>Save</button>
-      {/* </form> */}
+      <button className="savebtn" type="submit" onClick={handleclick}>Save</button>
+      </form>
+    </div> */}
     </div>
   );
 }
@@ -394,6 +576,7 @@ function MainPage(){
 
 
   const [AddFriendsData, setAddFriendsData] = useState(null); 
+  const [Postimg, setPostimg] = useState(null); 
   let navigate = useNavigate(); 
   return(
     <div className='MainPage'>
@@ -406,11 +589,20 @@ function MainPage(){
       <div className='MainComp'>
         <div className='mainNav'>
           <div className='bar'>
-              <img src="./Home.svg" alt="home" className={HomeFlag? "select" : "unselect"} onClick={event =>{
+              <img src="./Home.svg" alt="home" className={HomeFlag? "select" : "unselect"} onClick={async (event) =>{
                 setHomeFlag(true); 
                 setAccountFlag(false);
                 setCommunityFlag(false);
                 setAddFriend(false);
+
+                const data = await fetch(`http://localhost:4000/user/userImage`,{
+                  headers: {'Content-Type': 'application/json'},
+                  mode: 'cors',
+                })
+                const dj = await data.blob(); 
+                // const dj = await data.json()
+                setPostimg(dj);
+                console.log(dj); 
               }}/>
               <img src="./Community.svg" alt="community" className={CommunityFlag? "select" : "unselect"} onClick={event =>{
                 setHomeFlag(false); 
@@ -442,17 +634,17 @@ function MainPage(){
               }}/>
           </div>
         </div>
-        {HomeFlag && <AllPosts/>}
+        {HomeFlag && Postimg && <AllPosts imgdata ={Postimg}/>}
         {CommunityFlag && <Community/>}
         {AccountFlag && <ProfileInfo/>}
-        {AddFriendFlag && <AddFriend data= {AddFriendsData}/>}
+        {AddFriendsData && AddFriendFlag && <AddFriend data= {AddFriendsData}/>}
         {/* <AllPosts/> */}
         {/* <ProfileInfo/> */}
         {/* <Community/> */}
         <div className='mainChats'>
             <div className='selection'>
               <img src="./AddEvent.svg" alt="AddEvent" className={AddPostFlag? "select" : "unselect"} onClick={event =>{
-                setMessengerFlag(false); 
+                setMessengerFlag(false);  
                 setAddPost(true);
               }}/>
               <img src="./Messenger.svg" alt="Chats" className={MessengerFlag? "select" : "unselect"} onClick={event =>{

@@ -408,6 +408,30 @@ h1{
   color: #3782e8;
 }
 
+.chatButton{
+  border:none;
+}
+
+.messagebox{
+  width:fit-content;
+  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  background-color: aqua;
+  border-radius: 15px;
+  margin:10px;
+}
+
+.leftbox{
+  display: flex;
+  justify-content:start
+}
+
+.rightbox{
+  display: flex;
+  justify-content: end;
+}
+
 .FriendPage{
   width: 55vw; 
   height: 90vh;
